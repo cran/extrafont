@@ -1,0 +1,1504 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "R/utils.r",
+			"settings":
+			{
+				"buffer_size": 1742,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "DESCRIPTION",
+			"settings":
+			{
+				"buffer_size": 915,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "README.md",
+			"settings":
+			{
+				"buffer_size": 6299,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "\n\nSearching 18 files for \"ttf2pt1\"\n\n/Users/winston/Dropbox/Projects/extrafont/DESCRIPTION:\n   10      has Computer Modern PostScript fonts with math symbols.\n   11      See https://github.com/wch/extrafont for instructions and examples.\n   12:     This product includes software developed by the TTF2PT1 Project\n   13      and its contributors.\n   14  Depends:\n   ..\n   16  Imports:\n   17      extrafontdb,\n   18:     Rttf2pt1\n   19  License: GPL-2\n   20  URL: https://github.com/wch/extrafont\n\n/Users/winston/Dropbox/Projects/extrafont/README.md:\n   25  extrafontdb contains the font database, while this package contains the code to install fonts and register them in the database.\n   26  \n   27: It also requires the **[Rttf2pt1](https://github.com/wch/Rttf2pt1)** package to be installed.\n   28: Rttf2pt1 contains the ttf2pt1 program which is used to read and manipulate TrueType fonts.\n   29  It is in a separate pacakge for licensing reasons.\n   30  \n   31: You can install the extrafontdb, Rttf2pt1, and extrafont packages directly from GitHub:\n   32  \n   33  ```R\n   34  library(devtools)\n   35: install_github('Rttf2pt1', 'wch')\n   36  install_github('extrafontdb', 'wch')\n   37  install_github('extrafont', 'wch')\n   38  library(extrafont)\n   39  \n   40: # In the future, installing extrafont from CRAN will automatically install extrafontdb and Rttf2pt1\n   41  ```\n   42  \n   ..\n  148  # Installation notes\n  149  \n  150: ## Rttf2pt1\n  151  \n  152: The source code for the utility program `ttf2pt1` is in the package Rttf2pt1.\n  153: It will be compiled on installation, so you need a build environment on your system (unless you install Rttf2pt1 as a precompiled package from CRAN).\n  154  \n  155  \n\n/Users/winston/Dropbox/Projects/extrafont/R/truetype.r:\n   43  \n   44  \n   45: # Finds the executable for ttf2pt1\n   46: which_ttf2pt1 <- function() {\n   47    if (.Platform$OS.type == \"unix\") {\n   48:     bin <- \"ttf2pt1\"\n   49      binpath <- file.path(inst_path(), \"exec\", .Platform$r_arch, bin)\n   50    } else if (.Platform$OS.type == \"windows\") {\n   51:     bin <- \"ttf2pt1.exe\"\n   52      binpath <- file.path(inst_path(), \"exec\", bin)\n   53    } else {\n   ..\n   82    tmpfiles <- file.path(tempdir(), \"fonts\", sub(\"\\\\.ttf$\", \"\", basename(ttfiles)))\n   83  \n   84:   ttf2pt1 <- which_ttf2pt1()\n   85    # Windows passes the args differently\n   86    if (.Platform$OS.type == \"windows\")  args <- c(\"-G\", \"fAe\")\n   ..\n   91  \n   92      # This runs:\n   93:     #  ttf2pt1 -GfAe /Library/Fonts/Impact.ttf /out/path/Impact\n   94      # The -GfAe options tell it to only create the .afm file, and not the\n   95:     # .t1a/pfa/pfb or .enc files. Run 'ttf2pt1 -G?' for more info.\n   96:     ret <- system2(ttf2pt1, c(args, shQuote(ttfiles[i]), shQuote(tmpfiles[i])),\n   97              stdout = TRUE, stderr = TRUE)\n   98  \n\n/Users/winston/Dropbox/Projects/extrafont/src/Makefile.win:\n    2  CFLAGS = `\"$(R_HOME)/bin/R\" CMD config CFLAGS`\n    3  \n    4: # CFLAGS for ttf2pt1\n    5: TTF2PT1_CFLAGS = $(CFLAGS) -DWINDOWS\n    6  \n    7  # Run make in subdirs\n    8  all:\n    9: 	echo \"make ttf2pt1 in ttf2pt1/ ...\"\n   10: 	(cd ttf2pt1; $(MAKE) CC=\"$(CC)\" CFLAGS=\"$(TTF2PT1_CFLAGS)\" ttf2pt1)\n   11  \n   12  clean:\n   13: 	echo \"make veryclean in ttf2pt1/ ...\"\n   14: 	(cd ttf2pt1; $(MAKE) veryclean)\n   15  \n\n/Users/winston/Dropbox/Projects/extrafont/src/Makevars:\n    2  CFLAGS = `\"$(R_HOME)/bin/R\" CMD config CFLAGS`\n    3  \n    4: # Flag for ttf2pt1 -- this is needed to un-set the CFLAGS_SYS var, which\n    5: # is set in ttf2pt1's Makefile\n    6: TTF2PT1_FLAGS = CFLAGS_SYS=\"\"\n    7  \n\n/Users/winston/Dropbox/Projects/extrafont/src/install.libs.R:\n    1: # Copy ttf2pt1/ttf2pt1 or ttf2pt1/ttf2pt1.exe binary to /exec/ or /exec/$R_ARCH,\n    2  # depending on platform\n    3  if (WINDOWS) {\n    4:   files <- file.path(\"ttf2pt1\", \"ttf2pt1.exe\")\n    5    execarch <- \"exec\"\n    6  \n    7  } else {\n    8:   files <- file.path(\"ttf2pt1\", \"ttf2pt1\")\n    9   # Default installation (from R extensions doc)\n   10   print(R_ARCH)\n\n/Users/winston/Dropbox/Projects/extrafont/src/ttf2pt1/Makefile:\n  111  #CFLAGS_PREF= -DPREFER_FREETYPE\n  112  \n  113: # Uncomment the second line to not compile t1asm into ttf2pt1\n  114  CFLAGS_EXTT1ASM=\n  115  #CFLAGS_EXTT1ASM= -DEXTERNAL_T1ASM\n  ...\n  125  BINDIR = $(INSTDIR)/bin\n  126  # for binaries of little general interest\n  127: LIBXDIR = $(INSTDIR)/libexec/ttf2pt1\n  128  # for scripts, maps/encodings etc.\n  129: SHAREDIR = $(INSTDIR)/share/ttf2pt1\n  130  MANDIR = $(INSTDIR)/man\n  131  \n  ...\n  148  TXTFILES = README* FONTS* CHANGES* COPYRIGHT\n  149  \n  150: MANS1=ttf2pt1.1 ttf2pt1_convert.1 ttf2pt1_x2gs.1\n  151  MANS=$(MANS1) $(MANS5)\n  152  \n  153: all:	t1asm ttf2pt1 docs mans rpm\n  154  \n  155  docs: $(DOCS)\n  ...\n  158  \n  159  clean:\n  160: 	rm -f t1asm ttf2pt1 *.o app/RPM/Makefile app/RPM/*.spec *.core core.* core\n  161  	( cd other && make clean; )\n  162  	( cd app/netscape && make clean; )\n  ...\n  165  	rm -f $(DOCS) $(MANS)\n  166  \n  167: rpm: app/RPM/Makefile app/RPM/ttf2pt1.spec\n  168  \n  169: ttf2pt1.1: README.html\n  170  	scripts/html2man . . <README.html\n  171  \n  172: ttf2pt1_convert.1 ttf2pt1_x2gs.1: FONTS.html\n  173  	scripts/html2man . . <FONTS.html\n  174  \n  ...\n  176  	sed 's/^CFLAGS_SYS.*=.*$$/CFLAGS_SYS= -O2 -D_GNU_SOURCE/;/warning:/,/^$$/s/^/#/' <Makefile >app/RPM/Makefile\n  177  \n  178: app/RPM/ttf2pt1.spec: app/RPM/ttf2pt1.spec.src version.h\n  179: 	sed 's/^Version:.*/Version: '`grep TTF2PT1_VERSION version.h| cut -d\\\" -f2`'/' <app/RPM/ttf2pt1.spec.src  >$@\n  180  \n  181  t1asm: t1asm.c\n  182  	$(CC) $(CFLAGS) -o t1asm -DSTANDALONE t1asm.c $(LIBS)\n  183  \n  184: ttf2pt1.o: ttf2pt1.c ttf.h pt1.h global.h version.h\n  185: 	$(CC) $(CFLAGS) -c ttf2pt1.c\n  186  \n  187  pt1.o: pt1.c ttf.h pt1.h global.h\n  ...\n  203  	$(CC) $(CFLAGS) $(CFLAGS_EXTT1ASM) -c runt1asm.c\n  204  \n  205: ttf2pt1:	ttf2pt1.o pt1.o runt1asm.o ttf.o ft.o bdf.o bitmap.o\n  206: 	$(CC) $(CFLAGS) -o ttf2pt1 ttf2pt1.o pt1.o runt1asm.o ttf.o ft.o bdf.o bitmap.o $(LIBS)\n  207  \n  208  CHANGES: CHANGES.html\n  ...\n  243  	chgrp -R $(GROUP) $(SHAREDIR)\n  244  	chmod -R go-w $(SHAREDIR)\n  245: 	scripts/inst_file ttf2pt1 $(BINDIR)/ttf2pt1 $(OWNER) $(GROUP) 0755\n  246  	[ -f $(BINDIR)/t1asm ] || scripts/inst_file t1asm $(LIBXDIR)/t1asm $(OWNER) $(GROUP) 0755\n  247: 	sed 's|^TTF2PT1_BINDIR=$$|TTF2PT1_BINDIR=$(BINDIR)|;\\\n  248: 		s|^TTF2PT1_LIBXDIR=$$|TTF2PT1_LIBXDIR=$(LIBXDIR)|;\\\n  249: 		s|^TTF2PT1_SHAREDIR=$$|TTF2PT1_SHAREDIR=$(SHAREDIR)|;' <scripts/convert >cvt.tmp\n  250: 	scripts/inst_file cvt.tmp $(BINDIR)/ttf2pt1_convert $(OWNER) $(GROUP) 0755\n  251  	scripts/inst_file cvt.tmp $(SHAREDIR)/scripts/convert $(OWNER) $(GROUP) 0755\n  252  	rm cvt.tmp\n  253: 	scripts/inst_file scripts/x2gs $(BINDIR)/ttf2pt1_x2gs $(OWNER) $(GROUP) 0755\n  254  	for i in $(MANS1); do { \\\n  255: 		sed 's|TTF2PT1_BINDIR|$(BINDIR)|;\\\n  256: 			s|TTF2PT1_LIBXDIR|$(LIBXDIR)|;\\\n  257: 			s|TTF2PT1_SHAREDIR|$(SHAREDIR)|;' <$$i >$(MANDIR)/man1/$$i \\\n  258  		&& chown $(OWNER) $(MANDIR)/man1/$$i \\\n  259  		&& chgrp $(GROUP) $(MANDIR)/man1/$$i \\\n  ...\n  263  \n  264  uninstall:\n  265: 	rm -f $(BINDIR)/ttf2pt1 $(BINDIR)/ttf2pt1_convert $(BINDIR)/ttf2pt1_x2gs\n  266  	rm -rf $(LIBXDIR)\n  267  	rm -rf $(SHAREDIR)\n\n81 matches across 7 files\n",
+			"settings":
+			{
+				"buffer_size": 7286,
+				"line_ending": "Unix",
+				"name": "Find Results",
+				"scratch": true
+			}
+		},
+		{
+			"file": "src/Makefile.win",
+			"settings":
+			{
+				"buffer_size": 359,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/ttf2pt1/Makefile",
+			"settings":
+			{
+				"buffer_size": 7743,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/install.libs.R",
+			"settings":
+			{
+				"buffer_size": 569,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "CC = `\"$(R_HOME)/bin/R\" CMD config CC`\nCFLAGS = `\"$(R_HOME)/bin/R\" CMD config CFLAGS`\n\n# Flag for ttf2pt1 -- this is needed to un-set the CFLAGS_SYS var, which\n# is set in ttf2pt1's Makefile\nTTF2PT1_FLAGS = CFLAGS_SYS=\"\"\n",
+			"file": "src/Makevars",
+			"file_size": 221,
+			"file_write_time": 1338948853000000,
+			"settings":
+			{
+				"buffer_size": 221,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "",
+	"command_palette":
+	{
+		"height": 327.0,
+		"selected_items":
+		[
+			[
+				"pack",
+				"Package Control: Upgrade Package"
+			],
+			[
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"oob",
+				"View: Toggle Open Files in Side Bar"
+			],
+			[
+				"packag",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 449.0
+	},
+	"console":
+	{
+		"height": 0.0
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/Users/winston/Dropbox/Projects/extrafont/extrafont.sublime-project",
+		"/Users/winston/Dropbox/Projects/extrafont/src/Makefile",
+		"/Users/winston/Dropbox/Projects/extrafont/R/load.r",
+		"/Users/winston/Dropbox/Projects/extrafont/R/font.r",
+		"/Users/winston/Dropbox/Projects/extrafont/TODO",
+		"/Users/winston/Dropbox/Projects/extrafont/LICENSE",
+		"/Users/winston/Dropbox/Projects/extrafont/fonts.sublime-project",
+		"/Users/winston/Dropbox/Projects/fonts/testcode.r",
+		"/Users/winston/Dropbox/Projects/fonts/fonts.sublime-project",
+		"/Users/winston/.Rprofile",
+		"/Users/winston/Dropbox/Projects/staticdocs/staticdocs.sublime-project",
+		"/Users/winston/Dropbox/Projects/ggplot2/bisect/552_test_break_oob.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/save.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/staticdocs.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/inst/tests/test-scales-breaks-labels.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/ggplot2.sublime-project",
+		"/Users/winston/Dropbox/Projects/ggplot2/test.json",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/theme.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/ggplot2.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/inst/tests/test-scales.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/aaa-.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/bisect/525_test_dodge.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/DESCRIPTION",
+		"/Users/winston/Dropbox/Projects/ggplot2/staticdocs.json",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/theme-defaults.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/bisect/test_break_oob.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/bisect/test_textdodge.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/stat-vline.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/stat-sum.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/stat-identity.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/stat-contour.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/stat-boxplot.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/stat-bin.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/position-stack.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/position-jitter.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/position-identity.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/position-fill.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/position-dodge.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/geom-vline.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/geom-violin.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/geom-tile.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/geom-text.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/geom-smooth.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/geom-segment.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/geom-ribbon-density.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/geom-ribbon-.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/geom-rect.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/geom-raster.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/geom-quantile.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/geom-polygon.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/geom-pointrange.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/geom-point-jitter.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/geom-point-.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/geom-path-step.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/geom-path-line.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/geom-path-density2d.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/geom-path-contour.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/geom-freqpoly.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/geom-errorh.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/geom-error.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/geom-dotplot.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/geom-crossbar.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/geom-boxplot.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/geom-bar-histogram.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/geom-bar-.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/geom-abline.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/coord-transform.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/coord-polar.r",
+		"/Users/winston/Dropbox/Projects/bisectr/R/bisect.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/bisect/test_template.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/NEWS",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/scale-.r",
+		"/Users/winston/Library/Application Support/Sublime Text 2/Packages/User/Preferences.sublime-settings",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/geom-hline.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/annotation-logticks.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/annotation-map.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/annotation-raster.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/inst/tests/helper-plot-data.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/stat-density.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/stat-bin2d.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/inst/tests/test-stats.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/visual_test/coord-polar.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/stat-density-2d.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/stat-smooth.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/scale-hue.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/labels.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/stat-smooth-methods.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/NAMESPACE",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/coord-.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/inst/tests/test-labels.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/scale-continuous-colour.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/aes.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/layer.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/scale-continuous.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/scale-discrete-colour.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/zxx.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/bisect/test_dateformat.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/inst/tests/test-facet-locate.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/stat-ydensity.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/plot-build.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/utilities-resolution.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/stat-model.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/panel.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/geom-path-.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/geom-.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/ggplot2.sublime-workspace",
+		"/Users/winston/Dropbox/Projects/ggplot2/temp-model.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/bisect/test_dodge.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/inst/tests/test-dotplot.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/inst/tests/test-boxplot.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/inst/tests/test-dodge.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/utilities-layer.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/stat-bindot.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/bin.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/work.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/482-ggplot-lines.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/499-empty-df.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/tempwork.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/temp-polar.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/polar-spacing.png",
+		"/Users/winston/Dropbox/Projects/ggplot2/visual_test/geom-path.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/stat-summary.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/annotation.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/visual_test/geom-raster.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/inst/tests/test-coord-train.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/coord-cartesian-.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/coord-map.r",
+		"/Users/winston/Dropbox/Projects/ggplot2/R/coord-fixed.r"
+	],
+	"find":
+	{
+		"height": 35.0
+	},
+	"find_in_files":
+	{
+		"height": 93.0,
+		"where_history":
+		[
+			"",
+			"/Users/winston/Dropbox/Projects/ggplot2/inst/tests",
+			"inst/tests",
+			"inst/tests/*",
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"ttf2pt1",
+			"rttf2pt1",
+			"prompt",
+			"dont",
+			"dontrun",
+			"setuppdf",
+			"embedextrafonts",
+			"embedextra",
+			"setuppdffont",
+			"pdf",
+			"setuppdf",
+			"setupextra",
+			"embedextra",
+			"inst_path",
+			"sd_icon",
+			"grid",
+			"build_pack",
+			"sd_sec",
+			"sd_secc",
+			"icon.",
+			"scale_shape_id",
+			"@param",
+			"param",
+			"class =",
+			"@import",
+			"s3method",
+			"names",
+			"theme_segment <",
+			"opts <",
+			"ggsave <-",
+			"time_trans",
+			"continuous_scale <-",
+			"scale_x_datet",
+			"inst_path",
+			"eval(",
+			"eval",
+			"safe.call <-",
+			"safe.call",
+			"major_source",
+			"scale_break_info <-",
+			"scale_train_df",
+			"train",
+			"inst/test",
+			"train",
+			".$",
+			"ggname",
+			"function(.)",
+			"panel.border",
+			"legend.box",
+			"legend.direc",
+			"legend.text.align",
+			"theme_bw <",
+			"plot.title",
+			"opts <-",
+			"icon <-",
+			"load_all",
+			"stat_uni",
+			"\", \"",
+			"scale_aesthetic_con",
+			"set_default_scale",
+			"zero_range",
+			"zero_range <-",
+			"scale_map",
+			"scale_break_positions",
+			"#' ",
+			"internal",
+			"scale_break_",
+			"# @key",
+			"#' @key",
+			"#` @key",
+			"# @",
+			"# @key",
+			"@keywords internal",
+			"@keyword ",
+			"scale_info",
+			"@keyword ",
+			"@keyword",
+			"@kohske",
+			"keyword",
+			"scale_info",
+			"scalE_info",
+			"scale_dimens",
+			"scale_dimension <",
+			"rename_a",
+			"labs <",
+			"travel around",
+			"direction to tra",
+			"direction",
+			"Other colour scales",
+			"colour scales",
+			"colour",
+			"evenly spaced",
+			"Other colour",
+			"other colour scal",
+			"scale_color_gre",
+			"scale_color_grae",
+			"scale_color_gra",
+			"title",
+			"trim",
+			"grid",
+			"grid: miss",
+			"grid:missing",
+			"mid1",
+			"all_aes",
+			"all_aesth",
+			"mig",
+			".all_aes",
+			"browser",
+			"middle",
+			"mid",
+			"nmid",
+			"mid",
+			"new <-",
+			"midend",
+			"expand",
+			"zero_range",
+			"train_position",
+			"resolu",
+			"resolution(",
+			"resolution",
+			"mods_loess",
+			"mods_lm",
+			"mod_loess",
+			"mod_lm",
+			"pdata",
+			"usemethod",
+			"method",
+			"cut"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"function()",
+			"\": \"",
+			"",
+			"mid",
+			"mid1",
+			"loess_mods",
+			"lm_mods",
+			"loess_mod",
+			"lm_mod",
+			"abline",
+			"vline",
+			"annotate_vline(",
+			"annotate_abline(",
+			"hline"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 3,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "R/utils.r",
+					"settings":
+					{
+						"buffer_size": 1742,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/R/R.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "DESCRIPTION",
+					"settings":
+					{
+						"buffer_size": 915,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "README.md",
+					"settings":
+					{
+						"buffer_size": 6299,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								6299,
+								6299
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Markdown/Markdown.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 2686.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"settings":
+					{
+						"buffer_size": 7286,
+						"regions":
+						{
+							"match":
+							{
+								"flags": 112,
+								"regions":
+								[
+									[
+										296,
+										303
+									],
+									[
+										419,
+										426
+									],
+									[
+										724,
+										731
+									],
+									[
+										757,
+										764
+									],
+									[
+										801,
+										808
+									],
+									[
+										822,
+										829
+									],
+									[
+										998,
+										1005
+									],
+									[
+										1121,
+										1128
+									],
+									[
+										1357,
+										1364
+									],
+									[
+										1437,
+										1444
+									],
+									[
+										1501,
+										1508
+									],
+									[
+										1529,
+										1536
+									],
+									[
+										1650,
+										1657
+									],
+									[
+										1818,
+										1825
+									],
+									[
+										1839,
+										1846
+									],
+									[
+										1926,
+										1933
+									],
+									[
+										2084,
+										2091
+									],
+									[
+										2286,
+										2293
+									],
+									[
+										2303,
+										2310
+									],
+									[
+										2481,
+										2488
+									],
+									[
+										2665,
+										2672
+									],
+									[
+										2719,
+										2726
+									],
+									[
+										2980,
+										2987
+									],
+									[
+										2995,
+										3002
+									],
+									[
+										3100,
+										3107
+									],
+									[
+										3111,
+										3118
+									],
+									[
+										3137,
+										3144
+									],
+									[
+										3175,
+										3182
+									],
+									[
+										3192,
+										3199
+									],
+									[
+										3255,
+										3262
+									],
+									[
+										3281,
+										3288
+									],
+									[
+										3454,
+										3461
+									],
+									[
+										3535,
+										3542
+									],
+									[
+										3561,
+										3568
+									],
+									[
+										3676,
+										3683
+									],
+									[
+										3684,
+										3691
+									],
+									[
+										3695,
+										3702
+									],
+									[
+										3703,
+										3710
+									],
+									[
+										3832,
+										3839
+									],
+									[
+										3843,
+										3850
+									],
+									[
+										3938,
+										3945
+									],
+									[
+										3949,
+										3956
+									],
+									[
+										4209,
+										4216
+									],
+									[
+										4405,
+										4412
+									],
+									[
+										4490,
+										4497
+									],
+									[
+										4616,
+										4623
+									],
+									[
+										4626,
+										4633
+									],
+									[
+										4644,
+										4651
+									],
+									[
+										4715,
+										4722
+									],
+									[
+										4814,
+										4821
+									],
+									[
+										5037,
+										5044
+									],
+									[
+										5065,
+										5072
+									],
+									[
+										5145,
+										5152
+									],
+									[
+										5163,
+										5170
+									],
+									[
+										5385,
+										5392
+									],
+									[
+										5407,
+										5414
+									],
+									[
+										5477,
+										5484
+									],
+									[
+										5530,
+										5537
+									],
+									[
+										5659,
+										5666
+									],
+									[
+										5670,
+										5677
+									],
+									[
+										5738,
+										5745
+									],
+									[
+										5875,
+										5882
+									],
+									[
+										5884,
+										5891
+									],
+									[
+										5964,
+										5971
+									],
+									[
+										5972,
+										5979
+									],
+									[
+										6174,
+										6181
+									],
+									[
+										6192,
+										6199
+									],
+									[
+										6337,
+										6344
+									],
+									[
+										6355,
+										6362
+									],
+									[
+										6395,
+										6402
+									],
+									[
+										6414,
+										6421
+									],
+									[
+										6456,
+										6463
+									],
+									[
+										6476,
+										6483
+									],
+									[
+										6578,
+										6585
+									],
+									[
+										6770,
+										6777
+									],
+									[
+										6856,
+										6863
+									],
+									[
+										6896,
+										6903
+									],
+									[
+										6938,
+										6945
+									],
+									[
+										7149,
+										7156
+									],
+									[
+										7167,
+										7174
+									],
+									[
+										7193,
+										7200
+									],
+									[
+										7286,
+										7286
+									]
+								],
+								"scope": ""
+							}
+						},
+						"selection":
+						[
+							[
+								3908,
+								3908
+							]
+						],
+						"settings":
+						{
+							"detect_indentation": false,
+							"output_tag": 4,
+							"result_base_dir": "",
+							"result_file_regex": "^([A-Za-z\\\\/<].*):$",
+							"result_line_regex": "^ +([0-9]+):",
+							"scroll_past_end": true,
+							"syntax": "Packages/Default/Find Results.hidden-tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 1783.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "src/Makefile.win",
+					"settings":
+					{
+						"buffer_size": 359,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								347,
+								347
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "src/ttf2pt1/Makefile",
+					"settings":
+					{
+						"buffer_size": 7743,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Makefile/Makefile.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "src/install.libs.R",
+					"settings":
+					{
+						"buffer_size": 569,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/R/R.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "src/Makevars",
+					"settings":
+					{
+						"buffer_size": 221,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								40,
+								40
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 0.0
+	},
+	"input":
+	{
+		"height": 33.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"replace":
+	{
+		"height": 64.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+			[
+				"theme",
+				"R/theme.r"
+			],
+			[
+				"static",
+				"staticdocs.r"
+			],
+			[
+				"hline",
+				"R/geom-hline.r"
+			],
+			[
+				"an",
+				"R/annotation-logticks.r"
+			],
+			[
+				"anno",
+				"R/annotation-map.r"
+			],
+			[
+				"stat-bin2d",
+				"R/stat-bin2d.r"
+			],
+			[
+				"coord-",
+				"R/coord-.r"
+			],
+			[
+				"namesp",
+				"NAMESPACE"
+			],
+			[
+				"coord",
+				"visual_test/coord-polar.r"
+			],
+			[
+				"news",
+				"NEWS"
+			],
+			[
+				"stat-densi",
+				"R/stat-density-2d.r"
+			],
+			[
+				"stat-smo",
+				"R/stat-smooth.r"
+			],
+			[
+				"stat-densit",
+				"R/stat-density-2d.r"
+			],
+			[
+				"scale-c",
+				"R/scale-discrete-colour.r"
+			],
+			[
+				"scale-colo",
+				"R/scale-continuous-colour.r"
+			],
+			[
+				"stat-ydens",
+				"R/stat-ydensity.r"
+			],
+			[
+				"stat-box",
+				"R/stat-boxplot.r"
+			],
+			[
+				"test-f",
+				"inst/tests/test-facet-locate.r"
+			],
+			[
+				"layer",
+				"R/layer.r"
+			],
+			[
+				"geom-",
+				"R/geom-.r"
+			],
+			[
+				"annotat-",
+				"R/annotation-logticks.r"
+			],
+			[
+				"sc",
+				"R/scale-continuous.r"
+			],
+			[
+				"plot-bu",
+				"R/plot-build.r"
+			],
+			[
+				"stat-boxplo",
+				"R/stat-boxplot.r"
+			],
+			[
+				"geom-box",
+				"R/geom-boxplot.r"
+			],
+			[
+				"utit",
+				"R/utilities-resolution.r"
+			],
+			[
+				"test-dot",
+				"inst/tests/test-dotplot.r"
+			],
+			[
+				"stat-mode",
+				"R/stat-model.r"
+			],
+			[
+				"geom-path",
+				"R/geom-path-.r"
+			],
+			[
+				"geom-pat",
+				"visual_test/geom-path.r"
+			],
+			[
+				"geom-se",
+				"R/geom-segment.r"
+			],
+			[
+				"geom-error",
+				"R/geom-error.r"
+			],
+			[
+				"geom-ji",
+				"R/geom-point-jitter.r"
+			],
+			[
+				"stat-sm",
+				"R/stat-smooth.r"
+			],
+			[
+				"stat-smoo",
+				"R/stat-smooth-methods.r"
+			],
+			[
+				"stat-bindot",
+				"R/stat-bindot.r"
+			],
+			[
+				"stat-bin",
+				"R/stat-bin.r"
+			],
+			[
+				"stat-su",
+				"R/stat-sum.r"
+			],
+			[
+				"stat-summar",
+				"R/stat-summary.r"
+			],
+			[
+				"stat-sum",
+				"R/stat-sum.r"
+			],
+			[
+				"geomrec",
+				"R/geom-rect.r"
+			],
+			[
+				"geom-ba",
+				"R/geom-bar-.r"
+			],
+			[
+				"geom-his",
+				"R/geom-bar-histogram.r"
+			],
+			[
+				"coord-trans",
+				"R/coord-transform.r"
+			],
+			[
+				"annotat",
+				"R/annotation.r"
+			],
+			[
+				"raster",
+				"visual_test/geom-raster.r"
+			],
+			[
+				"panel",
+				"R/panel.r"
+			],
+			[
+				"scale-",
+				"R/scale-.r"
+			],
+			[
+				"coord-t",
+				"inst/tests/test-coord-train.r"
+			],
+			[
+				"coord-car",
+				"R/coord-cartesian-.r"
+			],
+			[
+				"coord-ma",
+				"R/coord-map.r"
+			],
+			[
+				"coord-pola",
+				"R/coord-polar.r"
+			],
+			[
+				"coord-fixed",
+				"R/coord-fixed.r"
+			],
+			[
+				"geom-po",
+				"R/geom-point-.r"
+			],
+			[
+				"geom-dot",
+				"R/geom-dotplot.r"
+			],
+			[
+				"locate",
+				"R/facet-locate.r"
+			],
+			[
+				"facet-w",
+				"R/facet-wrap.r"
+			],
+			[
+				"stat",
+				"R/stat-identity.r"
+			],
+			[
+				"geom-poin",
+				"R/geom-point-.r"
+			],
+			[
+				"facet-gr",
+				"R/facet-grid-.r"
+			],
+			[
+				"geom-poi",
+				"R/geom-point-.r"
+			],
+			[
+				"discret",
+				"R/scale-discrete-.r"
+			],
+			[
+				"annota",
+				"R/annotation.r"
+			],
+			[
+				"test-sta",
+				"tests/test-stats.r"
+			],
+			[
+				"facet",
+				"tests/test-facet-.r"
+			],
+			[
+				"q",
+				"R/quick-plot.r"
+			],
+			[
+				"facet-wra",
+				"R/facet-wrap.r"
+			],
+			[
+				"minor-",
+				"visual_test/minor-breaks.r"
+			],
+			[
+				"fortif",
+				"R/fortify.r"
+			],
+			[
+				"geom-point",
+				"R/geom-point-.r"
+			],
+			[
+				"geom-te",
+				"R/geom-text.r"
+			],
+			[
+				"geom-smo",
+				"R/geom-smooth.r"
+			],
+			[
+				"stat-smooth",
+				"R/stat-smooth.r"
+			],
+			[
+				"plot-b",
+				"R/plot-build.r"
+			],
+			[
+				"scale-brea",
+				"visual_test/scale-breaks.r"
+			],
+			[
+				"coord-pl",
+				"R/coord-polar.r"
+			],
+			[
+				"coord-polar",
+				"R/coord-polar.r"
+			],
+			[
+				"geom-.",
+				"R/geom-.r"
+			],
+			[
+				"geom-ab",
+				"R/geom-abline.r"
+			],
+			[
+				"scale-con",
+				"R/scale-continuous.r"
+			],
+			[
+				"geom-v",
+				"R/geom-vline.r"
+			],
+			[
+				"lines",
+				"visual_test/lines.r"
+			],
+			[
+				"geom-hline",
+				"R/geom-hline.r"
+			],
+			[
+				"test-coord-",
+				"tests/test-coord-train.r"
+			],
+			[
+				"coord-tran",
+				"R/coord-transform.r"
+			],
+			[
+				"coord-map",
+				"R/coord-map.r"
+			],
+			[
+				"coord-train",
+				"tests/test-coord-train.r"
+			],
+			[
+				"coord-o",
+				"R/coord-polar.r"
+			],
+			[
+				"scale-disc",
+				"R/scale-discrete-.r"
+			],
+			[
+				"scale-datet",
+				"R/scale-datetime.r"
+			],
+			[
+				"scale-d",
+				"R/scale-date.r"
+			],
+			[
+				"aaa-",
+				"R/aaa-.r"
+			],
+			[
+				"geom-boxplo",
+				"R/geom-boxplot.r"
+			],
+			[
+				"geom-hlin",
+				"R/geom-hline.r"
+			],
+			[
+				"geom-abl",
+				"R/geom-abline.r"
+			],
+			[
+				"annot",
+				"R/annotate-hline.r"
+			],
+			[
+				"annotate",
+				"R/annotate-lines.r"
+			],
+			[
+				"geom-vlie",
+				"R/geom-vline.r"
+			],
+			[
+				"stat-iden",
+				"R/stat-identity.r"
+			],
+			[
+				"anntate-",
+				"R/annotate-hline.r"
+			],
+			[
+				"stat-id",
+				"R/stat-identity.r"
+			],
+			[
+				"violin",
+				"visual_test/violin.r"
+			],
+			[
+				"dotplo",
+				"visual_test/dotplot.r"
+			],
+			[
+				"scale",
+				"R/scale-.r"
+			],
+			[
+				"dotp",
+				"visual_test/dotplot.r"
+			],
+			[
+				"polar",
+				"visual_test/coord-polar.r"
+			],
+			[
+				"plot-ren",
+				"R/plot-render.r"
+			],
+			[
+				"plot-",
+				"R/plot-build.r"
+			],
+			[
+				"coord-po",
+				"tests/test-coord-polar.r"
+			],
+			[
+				"coord-p",
+				"R/coord-polar.r"
+			],
+			[
+				"coord-tra",
+				"R/coord-transform.r"
+			],
+			[
+				"coord-mun",
+				"R/coord-munch.r"
+			],
+			[
+				"test-scale",
+				"tests/test-scales-breaks-labels.r"
+			],
+			[
+				"facet-lo",
+				"facet-locate.r"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"selected_items":
+		[
+		],
+		"width": 380.0
+	},
+	"show_minimap": true,
+	"show_open_files": true,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 204.0,
+	"status_bar_visible": true
+}
