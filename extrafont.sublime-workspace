@@ -11,7 +11,7 @@
 			"file": "R/utils.r",
 			"settings":
 			{
-				"buffer_size": 1742,
+				"buffer_size": 1745,
 				"line_ending": "Unix"
 			}
 		},
@@ -19,7 +19,7 @@
 			"file": "README.md",
 			"settings":
 			{
-				"buffer_size": 6224,
+				"buffer_size": 6695,
 				"line_ending": "Unix"
 			}
 		},
@@ -43,7 +43,23 @@
 			"file": "NEWS",
 			"settings":
 			{
-				"buffer_size": 95,
+				"buffer_size": 374,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "R/load.r",
+			"settings":
+			{
+				"buffer_size": 5474,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "DESCRIPTION",
+			"settings":
+			{
+				"buffer_size": 871,
 				"line_ending": "Unix"
 			}
 		}
@@ -397,7 +413,7 @@
 	"groups":
 	[
 		{
-			"selected": 0,
+			"selected": 5,
 			"sheets":
 			[
 				{
@@ -405,15 +421,15 @@
 					"file": "R/utils.r",
 					"settings":
 					{
-						"buffer_size": 1742,
+						"buffer_size": 1745,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1271,
-								1271
+								1720,
+								1720
 							]
 						],
 						"settings":
@@ -423,7 +439,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 271.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -433,15 +449,15 @@
 					"file": "README.md",
 					"settings":
 					{
-						"buffer_size": 6224,
+						"buffer_size": 6695,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								3023,
-								3028
+								6695,
+								6695
 							]
 						],
 						"settings":
@@ -449,7 +465,7 @@
 							"syntax": "Packages/Markdown/Markdown.tmLanguage"
 						},
 						"translation.x": 0.0,
-						"translation.y": 1077.0,
+						"translation.y": 2788.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -477,7 +493,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 1541.0,
+						"translation.y": 1.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -513,20 +529,76 @@
 					"file": "NEWS",
 					"settings":
 					{
-						"buffer_size": 95,
+						"buffer_size": 374,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								64,
-								64
+								0,
+								0
 							]
 						],
 						"settings":
 						{
 							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "R/load.r",
+					"settings":
+					{
+						"buffer_size": 5474,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								435,
+								435
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/R/R.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "DESCRIPTION",
+					"settings":
+					{
+						"buffer_size": 871,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								525,
+								525
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,

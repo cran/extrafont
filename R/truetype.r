@@ -8,15 +8,22 @@
 #'
 #' @param paths A vector of directories to search in. (Default is to auto-detect based on OS)
 #' @param recursive Search recursively in directories? (Default TRUE)
+#' @param pattern A regular expression that the filenames must match.
 #'
 #' @importFrom Rttf2pt1 which_ttf2pt1
 #' @export
-ttf_import <- function(paths = NULL, recursive = TRUE) {
+ttf_import <- function(paths = NULL, recursive = TRUE, pattern = NULL) {
 
   if (is.null(paths))  paths <- ttf_find_default_path()
 
   ttfiles <- normalizePath(list.files(paths, pattern = "\\.ttf$",
-                                      full.names=TRUE, recursive = recursive))
+                                      full.names=TRUE, recursive = recursive,
+                                      ignore.case = TRUE))
+
+  if (!is.null(pattern)) {
+    matchfiles <- grepl(pattern, basename(ttfiles))
+    ttfiles <- ttfiles[matchfiles]
+  }
 
   # This message really belongs in ttf_scan_files, but the pathnames
   # are lost by that point...
@@ -52,15 +59,21 @@ ttf_extract <- function(ttfiles) {
   fontdata <- data.frame(fontfile = ttfiles, FontName = "", 
                          stringsAsFactors = FALSE)
 
-  outfiles <- file.path(metrics_path(), sub("\\.ttf$", "", basename(ttfiles)))
+  outfiles <- file.path(metrics_path(),
+                sub("\\.ttf$", "", basename(ttfiles), ignore.case = TRUE))
 
   dir.create(file.path(tempdir(), "fonts"), showWarnings = FALSE)
-  tmpfiles <- file.path(tempdir(), "fonts", sub("\\.ttf$", "", basename(ttfiles)))
+  tmpfiles <- file.path(tempdir(), "fonts",
+                sub("\\.ttf$", "", basename(ttfiles), ignore.case = TRUE))
 
   ttf2pt1 <- which_ttf2pt1()
+
   # Windows passes the args differently
-  if (.Platform$OS.type == "windows")  args <- c("-G", "fAe")
-  else                                 args <- c("-GfAe")
+  # -pft means use Freetype to process fonts
+  # -a means extract all glyphs (needed for minus sign - latin1 doesn't include it)
+  # -GfAe means extract AFM file only
+  if (.Platform$OS.type == "windows")  args <- c("-a", "-G", "fAe")
+  else                                 args <- c("-a", "-GfAe")
 
   for (i in seq_along(ttfiles)) {
     message(ttfiles[i], appendLF = FALSE)
@@ -91,8 +104,9 @@ ttf_extract <- function(ttfiles) {
 
     } else {
       fontdata$FontName[i] <- fontname
-      file.copy(paste(tmpfiles[i], ".afm", sep=""),
-        paste(outfiles[i], ".afm", sep=""))
+      gzcopy(paste(tmpfiles[i], ".afm", sep=""),
+             paste(outfiles[i], ".afm.gz", sep=""),
+             delete = TRUE)
       message(" => ", paste(outfiles[i], sep=""))
     }
   }
