@@ -1,11 +1,21 @@
+extrafont 0.12
+----------------------------------------------------------------
+
+* One of the Linux font search paths has been changed to /usr/share/fonts, so
+  that it works with Arch and Gentoo.
+
+* extrafont now searches in the user font directory, ~/.fonts on Linux
+  and BSD, and ~/Library/Fonts on Mac OS X.
+
 extrafont 0.11
 ----------------------------------------------------------------
 
 * extrafont now ignores case when searching for font files.
 
-* All glyphs are imported from Truetype fonts. This fixes problems where
-  hyphens and minus signs were not allocated enough space. (Thanks to
-  Brian Kriegler and Erik Iverson for their investigation of the problem.
+* All metrics are imported from Truetype fonts. Previously, only the
+  metrics for Latin1 were imported. This fixes problems where hyphens
+  and minus signs were not allocated enough space. (Thanks to Brian
+  Kriegler and Erik Iverson for their investigation of the problem.
   Fixes #11)
 
 * The AFM (font metrics) files are now gzipped.
