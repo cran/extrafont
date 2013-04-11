@@ -1,4 +1,13 @@
-extrafont 0.12.99
+extrafont 0.14
+----------------------------------------------------------------
+
+* Workaround for a bug in ghostscript: if the fontmap path includes the string
+  "Resources", it gives an error. Now, in this situation, a temporary symlink
+  is made to the fontmap path. (Thanks to Kohske Takahashi)
+
+* `loadfonts(quiet=TRUE)` no longer displays warning messages.
+
+extrafont 0.13
 ----------------------------------------------------------------
 
 * embed_fonts() now can handle filenames with spaces.
