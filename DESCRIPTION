@@ -1,6 +1,6 @@
 Package: extrafont
 Title: Tools for using fonts
-Version: 0.15
+Version: 0.16
 Author: Winston Chang <winston@stdout.org>,
 Maintainer: Winston Chang <winston@stdout.org>
 Description: Tools to using fonts other than the standard PostScript fonts.
@@ -15,9 +15,7 @@ Imports: extrafontdb, grDevices, utils, Rttf2pt1
 Suggests: fontcm
 License: GPL-2
 URL: https://github.com/wch/extrafont
-Collate: 'aaa.r' 'load.r' 'truetype.r' 'utils.r' 'extrafont.r'
-        'type1.r' 'afm.r' 'font.r' 'fonttable.r' 'choosefont.r'
-Packaged: 2013-08-30 03:59:38 UTC; winston
+Packaged: 2014-01-09 16:45:54 UTC; winston
 NeedsCompilation: no
 Repository: CRAN
-Date/Publication: 2013-08-30 06:34:52
+Date/Publication: 2014-01-09 21:40:43
