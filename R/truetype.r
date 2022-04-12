@@ -82,7 +82,7 @@ ttf_extract <- function(ttfiles) {
     #  ttf2pt1 -GfAe /Library/Fonts/Impact.ttf /out/path/Impact
     # The -GfAe options tell it to only create the .afm file, and not the
     # .t1a/pfa/pfb or .enc files. Run 'ttf2pt1 -G?' for more info.
-    ret <- system2(ttf2pt1, c(args, shQuote(ttfiles[i]), shQuote(tmpfiles[i])),
+    ret <- system2(enc2native(ttf2pt1), c(args, shQuote(ttfiles[i]), shQuote(tmpfiles[i])),
             stdout = TRUE, stderr = TRUE)
 
     fontnameidx <- grepl("^FontName ", ret)
@@ -128,6 +128,7 @@ ttf_find_default_path <- function() {
     paths <-
       c("/Library/Fonts/",                      # System fonts
         "/System/Library/Fonts",                # More system fonts
+        "/System/Library/Fonts/Supplemental",   # More system fonts
         "~/Library/Fonts/")                     # User fonts
     return(paths[file.exists(paths)])
 
@@ -136,6 +137,7 @@ ttf_find_default_path <- function() {
     paths <-
       c("/usr/share/fonts/",                    # Ubuntu/Debian/Arch/Gentoo
         "/usr/X11R6/lib/X11/fonts/TrueType/",   # RH 6
+        "~/.local/share/fonts/",                # Added with Gnome font viewer
         "~/.fonts/")                            # User fonts
     return(paths[file.exists(paths)])
 
@@ -148,7 +150,11 @@ ttf_find_default_path <- function() {
     return(paths[file.exists(paths)])
 
   } else if (grepl("^mingw", R.version$os)) {
-    return(paste(Sys.getenv("SystemRoot"), "\\Fonts", sep=""))
+    paths <-
+      c(file.path(Sys.getenv("SystemRoot"), "Fonts"),
+        file.path(Sys.getenv("LOCALAPPDATA"), "Microsoft", "Windows", "Fonts")
+      )
+    return(paths[file.exists(paths)])
   } else {
     stop("Unknown platform. Don't know where to look for truetype fonts. Sorry!")
   }
